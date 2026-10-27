@@ -4,15 +4,19 @@
 
 using namespace std;
 
-void groceryBudget() {
+void clearScreen() { // CLEAR TERMINAL
+    std::cout << "\033[1;1H\033[2J";
+}
+
+void groceryBudget() { // GROCERY BUDGET TRACKER
     cout << "You selected Grocery Budget Tracker!";
 }
 
-void inventoryTracker() {
+void inventoryTracker() { // INVENTORY TRACKER FUNCTION
     cout << "You selected Inventory Tracker!";
 }
 
-int main() {
+int main() { // MENU SCREEN
     
     int response;
 
@@ -24,9 +28,11 @@ int main() {
 
     switch (response) {
         case 1:
+            clearScreen();
             groceryBudget();
             break;
         case 2:
+            clearScreen();
             inventoryTracker();
             break;
     }
