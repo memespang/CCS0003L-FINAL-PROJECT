@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdlib>
+#include <limits>
 
 using namespace std;
 
@@ -35,11 +36,24 @@ int main() { // MENU SCREEN
             inventoryTracker();
             break;
         default:
-            do {
-              cout << "Invalid input! Please enter 1 or 2!" << endl;
-              cout << "You: ";
-              cin >> response;
-            } while (response != 1 || response != 2);
+            while (true) {
+        cin >> response;
+
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+            cout << "Invalid input! Please enter 1 or 2!" << endl;
+            cout << "You: ";
+            continue;
+        }
+        if (response != 1 && response != 2) {
+            cout << "Invalid input! Please enter 1 or 2!" << endl;
+            cout << "You: ";
+            continue;
+        }
+        break;
+        }
     }
     return 0;
-}
+}   
