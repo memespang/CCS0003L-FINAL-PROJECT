@@ -26,7 +26,6 @@ int main() { // MENU SCREEN
     do {
         cout << "You: ";
         cin >> response;
-
         if (response != "1" && response != "2") {
             cout << "Invalid input. Please enter 1 or 2." << endl;
         }
