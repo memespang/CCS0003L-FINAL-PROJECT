@@ -5,7 +5,7 @@
 using namespace std;
 
 void clearScreen() { // CLEAR TERMINAL
-    std::cout << "\033[1;1H\033[2J";
+    cout << "\033[1;1H\033[2J";
 }
 
 void groceryBudget() { // GROCERY BUDGET TRACKER
