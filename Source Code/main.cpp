@@ -34,6 +34,12 @@ int main() { // MENU SCREEN
             clearScreen();
             inventoryTracker();
             break;
+        default:
+            do {
+              cout << "Invalid input! Please enter 1 or 2!" << endl;
+              cout << "You: ";
+              cin >> response;
+            } while (response != 1 || response != 2);
     }
     return 0;
 }
