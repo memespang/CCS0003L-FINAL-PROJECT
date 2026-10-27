@@ -17,29 +17,42 @@ void inventoryTracker() { // INVENTORY TRACKER FUNCTION
 }
 
 int main() { // MENU SCREEN
-    
-    char response;
+
+    int response;
 
     cout << "Welcome to [TITLE]. Please select a function." << endl;
     cout << "1. Grocery Budget Tracker" << endl;
     cout << "2. Inventory Tracker" << endl;
     cout << "You: ";
-    cin >> response;
-
-    do {
-        cout << "Invalid input. Please select 1 or 2!" << endl;
-        cout << "You: ";
+ 
+    while (true) {
         cin >> response;
-    } while (response != '1' && response != '2');
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
-    switch(response) {
-        case '1':
+            cout << "Invalid input! Please enter 1 or 2!" << endl;
+            cout << "You: ";
+            continue;
+        }
+
+        if (response != 1 && response != 2) {
+            cout << "Invalid input! Please enter 1 or 2!" << endl;
+            cout << "You: ";
+            continue;
+        }
+        break;
+    }
+
+    switch (response) {
+        case 1:
             clearScreen();
             groceryBudget();
             break;
-        case '2':
+        case 2:
             clearScreen();
             inventoryTracker();
+            break;
     }
     return 0;
-}   
+}
