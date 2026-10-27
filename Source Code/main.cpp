@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <cstdlib>
 #include <limits>
@@ -18,44 +17,43 @@ void inventoryTracker() { // INVENTORY TRACKER FUNCTION
 }
 
 int main() { // MENU SCREEN
-
+    
     int response;
 
     cout << "Welcome to [TITLE]. Please select a function." << endl;
     cout << "1. Grocery Budget Tracker" << endl;
     cout << "2. Inventory Tracker" << endl;
+    cout << "You: ";
+    cin >> response;
 
-    while (true) {
-        cout << "You: ";
+    switch (response) {
+        case 1:
+            clearScreen();
+            groceryBudget();
+            break;
+        case 2:
+            clearScreen();
+            inventoryTracker();
+            break;
+        default:
+            while (true) {
+        cin >> response;
 
-        if (!(cin >> response)) {
+        if (cin.fail()) {
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
             cout << "Invalid input! Please enter 1 or 2!" << endl;
+            cout << "You: ";
             continue;
         }
-
         if (response != 1 && response != 2) {
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
             cout << "Invalid input! Please enter 1 or 2!" << endl;
+            cout << "You: ";
             continue;
         }
-
         break;
+        }
     }
-
-    switch (response) {
-    case 1:
-        clearScreen();
-        groceryBudget();
-        break;
-
-    case 2:
-        clearScreen();
-        inventoryTracker();
-        break;
-    }
-
     return 0;
-}
+}   
