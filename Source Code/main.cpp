@@ -1,11 +1,10 @@
 #include <iostream>
-#include <iomanip>
-#include <vector>
+#include <cstdlib>
 
 using namespace std;
 
 void clearScreen() { // CLEAR TERMINAL
-    cout << "\033[1;1H\033[2J";
+    system("cls");
 }
 
 void groceryBudget() { // GROCERY BUDGET TRACKER
