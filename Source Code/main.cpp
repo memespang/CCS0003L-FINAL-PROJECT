@@ -1,5 +1,8 @@
 #include <iostream>
 #include <cstdlib>
+#include <vector>
+#include <list>
+#include <string>
 
 using namespace std;
 
@@ -8,7 +11,30 @@ void clearScreen() { // CLEAR TERMINAL
 }
 
 void groceryBudget() { // GROCERY BUDGET TRACKER
-    cout << "You selected Grocery Budget Tracker!";
+    double totalBudget, price;
+    string item;
+    vector<string> groceryList;
+    list<double> totalPrice; 
+    bool isRunning = true;
+
+    cout << "Please enter your grocery budget: ";
+    cin >> totalBudget;
+
+    while (isRunning) {
+        clearScreen();
+        cout << "Remaining Budget: " << totalBudget << endl;
+        cout << "*************************" << endl;
+
+        cout << "Enter item: ";
+        getline(cin >> ws, item);
+        cout << "Enter price: ";
+        cin >> price;
+        totalBudget -= price;
+        
+        groceryList.push_back(item);
+        totalPrice.push_back(price);
+    }
+
 }
 
 void inventoryTracker() { // INVENTORY TRACKER FUNCTION
