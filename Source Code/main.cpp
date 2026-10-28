@@ -1,10 +1,17 @@
 #include <iostream>
 #include <cstdlib>
 #include <vector>
-#include <list>
 #include <string>
+#include <numeric>
+#include <limits>
 
 using namespace std;
+
+void wait_for_enter() { // WAITS FOR THE USER TO PRESS ENTER TO CONTINUE THE PROGRAM
+    cout << "Press Enter to continue...";
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    cin.get();
+}
 
 void clearScreen() { // CLEAR TERMINAL
     system("cls");
@@ -12,9 +19,11 @@ void clearScreen() { // CLEAR TERMINAL
 
 void groceryBudget() { // GROCERY BUDGET TRACKER
     double totalBudget, price;
+    int quantity;
     string item;
     vector<string> groceryList;
-    list<double> totalPrice; 
+    vector<double> totalPrice; 
+    vector<int> quantityList;
     bool isRunning = true;
 
     cout << "Please enter your grocery budget: ";
@@ -23,16 +32,37 @@ void groceryBudget() { // GROCERY BUDGET TRACKER
     while (isRunning) {
         clearScreen();
         cout << "Remaining Budget: " << totalBudget << endl;
-        cout << "*************************" << endl;
+        cout << "--------------------------" << endl;
 
-        cout << "Enter item: ";
+        cout << "Enter item (Q to quit): ";
         getline(cin >> ws, item);
-        cout << "Enter price: ";
-        cin >> price;
-        totalBudget -= price;
-        
-        groceryList.push_back(item);
-        totalPrice.push_back(price);
+        if (item == "q" || item == "Q") {
+            clearScreen();
+            cout << "----------SUMMARY----------" << endl;
+            for (size_t i = 0; i < size(groceryList); i++) {
+                cout << quantityList[i] << "x " << groceryList[i] << "\t" << totalPrice[i] << endl;
+            }
+
+            cout << "Total:\t" << accumulate(totalPrice.begin(), totalPrice.end(), 0.0);
+
+            break;
+        }else {
+            cout << "Enter unit price: ";
+            cin >> price;
+            cout << "Enter quantity: ";
+            cin >> quantity;
+            price *= quantity;
+            if (price > totalBudget) {
+                cout << "Item has exceeded the budget!" << endl;
+                wait_for_enter();
+            }else {
+                totalBudget -= price;
+                groceryList.push_back(item);
+                quantityList.push_back(quantity);
+                totalPrice.push_back(price);
+            }
+            
+        }
     }
 
 }
