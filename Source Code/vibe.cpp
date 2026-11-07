@@ -32,6 +32,7 @@ struct LaundryOrder {
 // stored in memory lang to, wala agad yan pag nag-exit ka sa program
 vector<Customer> customers;
 vector<LaundryOrder> orders;
+//preset values
 vector<Service> services = {
     {"Wash and Fold", 50.00},
     {"Wash and Iron", 70.00},
