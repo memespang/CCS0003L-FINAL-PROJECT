@@ -1,4 +1,5 @@
 #include <iomanip>
+#include <cstdlib>
 #include <iostream>
 #include <limits>
 #include <string>
@@ -44,6 +45,7 @@ int nextOrderID = 1;
 
 // Function declarations
 void clearTerminal();
+bool readInput(const string& prompt, string& input);
 string getRequiredText(const string& prompt);
 int getInteger(const string& prompt, int minimum, int maximum);
 double getPositiveNumber(const string& prompt);
@@ -65,6 +67,14 @@ int main() {
     do {
         showMainMenu();
         choice = getInteger("Choose an option: ", 0, 7);
+
+        // Stop cleanly if the input stream closes; Q simply shows the menu again.
+        if (choice == -1) {
+            if (!cin) {
+                break;
+            }
+            continue;
+        }
 
         switch (choice) {
             case 1:
@@ -103,12 +113,32 @@ void clearTerminal() {
     system("cls");
 
 }
+
+// Every input helper uses this reader so Q works at every prompt.
+bool readInput(const string& prompt, string& input) {
+    cout << prompt;
+
+    if (!getline(cin, input)) {
+        return false;
+    }
+
+    if (input == "q" || input == "Q") {
+        clearTerminal();
+        cout << "Input cancelled. Returning to the main menu.\n";
+        return false;
+    }
+
+    return true;
+}
+
 string getRequiredText(const string& prompt) {
     string value;
 
     while (true) {
-        cout << prompt;
-        getline(cin, value);
+        // Empty string means cancelled; a blank entry is still rejected below.
+        if (!readInput(prompt, value)) {
+            return "";
+        }
 
         if (!value.empty()) {
             return value;
@@ -122,8 +152,9 @@ int getInteger(const string& prompt, int minimum, int maximum) {
     string input;
 
     while (true) {
-        cout << prompt;
-        getline(cin, input);
+        if (!readInput(prompt, input)) {
+            return -1;
+        }
 
         try {
             size_t charactersRead = 0;
@@ -146,8 +177,9 @@ double getPositiveNumber(const string& prompt) {
     string input;
 
     while (true) {
-        cout << prompt;
-        getline(cin, input);
+        if (!readInput(prompt, input)) {
+            return -1;
+        }
 
         try {
             size_t charactersRead = 0;
@@ -187,11 +219,19 @@ int findOrderIndex(int orderID) {
 void addCustomer() {
     clearTerminal();
     Customer customer;
-    customer.id = nextCustomerID++;
-    customer.name = getRequiredText("Customer name: ");
-    customer.contactNumber = getRequiredText("Contact number: ");
+    customer.name = getRequiredText("Customer name (Q to cancel): ");
+    if (customer.name.empty()) {
+        return;
+    }
 
+    customer.contactNumber = getRequiredText("Contact number (Q to cancel): ");
+    if (customer.contactNumber.empty()) {
+        return;
+    }
+
+    customer.id = nextCustomerID;
     customers.push_back(customer);
+    nextCustomerID++;
     clearTerminal();
     cout << "Customer added. Customer ID: " << customer.id << "\n";
 }
@@ -217,8 +257,12 @@ void deleteCustomer() {
         return;
     }
 
-    int customerID = getInteger("Enter the customer ID to delete: ", 1,
+    int customerID = getInteger("Enter the customer ID to delete (Q to cancel): ", 1,
                                 numeric_limits<int>::max());
+    if (customerID == -1) {
+        return;
+    }
+
     int customerIndex = findCustomerIndex(customerID);
 
     if (customerIndex == -1) {
@@ -255,9 +299,16 @@ void showServices() {
 void editServiceRates() {
     showServices();
 
-    int serviceChoice = getInteger("Choose the service to edit: ", 1,
+    int serviceChoice = getInteger("Choose the service to edit (Q to cancel): ", 1,
                                    static_cast<int>(services.size()));
-    double newRate = getPositiveNumber("Enter the new price per kilo: ");
+    if (serviceChoice == -1) {
+        return;
+    }
+
+    double newRate = getPositiveNumber("Enter the new price per kilo (Q to cancel): ");
+    if (newRate == -1) {
+        return;
+    }
 
     services[serviceChoice - 1].ratePerKilo = newRate;
 
@@ -273,8 +324,11 @@ void createOrder() {
     }
 
     viewCustomers();
-    int customerID = getInteger("Enter the customer ID for this order: ", 1,
+    int customerID = getInteger("Enter the customer ID for this order (Q to cancel): ", 1,
                                 numeric_limits<int>::max());
+    if (customerID == -1) {
+        return;
+    }
 
     if (findCustomerIndex(customerID) == -1) {
         clearTerminal();
@@ -283,21 +337,37 @@ void createOrder() {
     }
 
     showServices();
-    int serviceChoice = getInteger("Choose a service: ", 1,
+    int serviceChoice = getInteger("Choose a service (Q to cancel): ", 1,
                                    static_cast<int>(services.size()));
-    double weight = getPositiveNumber("Enter the laundry weight in kilos: ");
+    if (serviceChoice == -1) {
+        return;
+    }
+
+    double weight = getPositiveNumber("Enter the laundry weight in kilos (Q to cancel): ");
+    if (weight == -1) {
+        return;
+    }
 
     LaundryOrder order;
-    order.id = nextOrderID++;
     order.customerID = customerID;
     order.serviceName = services[serviceChoice - 1].name;
     order.weight = weight;
     order.totalBill = weight * services[serviceChoice - 1].ratePerKilo;
-    order.dateReceived = getRequiredText("Date received (YYYY-MM-DD): ");
-    order.pickupDate = getRequiredText("Pick-up date (YYYY-MM-DD): ");
+    order.dateReceived = getRequiredText("Date received (YYYY-MM-DD, Q to cancel): ");
+    if (order.dateReceived.empty()) {
+        return;
+    }
+
+    order.pickupDate = getRequiredText("Pick-up date (YYYY-MM-DD, Q to cancel): ");
+    if (order.pickupDate.empty()) {
+        return;
+    }
+
     order.status = "Received";
 
+    order.id = nextOrderID;
     orders.push_back(order);
+    nextOrderID++;
     clearTerminal();
     cout << "Order created. Order ID: " << order.id
          << " | Total bill: P" << fixed << setprecision(2)
@@ -334,8 +404,12 @@ void printReceipt() {
         return;
     }
     displayOrders();
-    int orderID = getInteger("Enter the order ID for the receipt: ", 1,
+    int orderID = getInteger("Enter the order ID for the receipt (Q to cancel): ", 1,
                              numeric_limits<int>::max());
+    if (orderID == -1) {
+        return;
+    }
+
     int orderIndex = findOrderIndex(orderID);
 
     if (orderIndex == -1) {
