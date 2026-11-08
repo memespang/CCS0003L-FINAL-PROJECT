@@ -3,8 +3,6 @@
 #include <limits>
 #include <string>
 #include <vector>
-#include <algorithm>
-#include <cctype>
 
 using namespace std;
 
@@ -45,6 +43,7 @@ int nextCustomerID = 1;
 int nextOrderID = 1;
 
 // Function declarations
+void clearTerminal();
 string getRequiredText(const string& prompt);
 int getInteger(const string& prompt, int minimum, int maximum);
 double getPositiveNumber(const string& prompt);
@@ -59,7 +58,6 @@ void createOrder();
 void displayOrders();
 void printReceipt();
 void showMainMenu();
-void clearScreen();
 
 int main() {
     int choice;
@@ -91,6 +89,7 @@ int main() {
                 editServiceRates();
                 break;
             case 0:
+                clearTerminal();
                 cout << "Goodbye! Data is not saved and will be lost when the program closes.\n";
                 break;
         }
@@ -100,20 +99,10 @@ int main() {
 }
 
 // Function definitions
-void clearScreen() {
+void clearTerminal() {
+    system("cls");
 
-    cout << "\nPress Enter to return to the menu.";
-
-    cin.clear(); // Clear any error flags
-
-    if (cin.rdbuf()->in_avail() > 0 || cin.peek() == '\n') {
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    } // Gets rid of leftover inputs
-
-    cin.get();
-    system("cls"); // Clear screen
 }
-
 string getRequiredText(const string& prompt) {
     string value;
 
@@ -135,14 +124,6 @@ int getInteger(const string& prompt, int minimum, int maximum) {
     while (true) {
         cout << prompt;
         getline(cin, input);
-
-        if (input.empty()) {
-            cin.clear(); 
-            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Discards input
-            cout << "Input cancelled.\n";
-            clearScreen();
-            return -1; 
-        }
 
         try {
             size_t charactersRead = 0;
@@ -167,14 +148,6 @@ double getPositiveNumber(const string& prompt) {
     while (true) {
         cout << prompt;
         getline(cin, input);
-
-        if (input.empty()) {
-            cin.clear(); 
-            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Discards input
-            cout << "Input cancelled.\n";
-            clearScreen();
-            return -1; 
-        }
 
         try {
             size_t charactersRead = 0;
@@ -212,49 +185,25 @@ int findOrderIndex(int orderID) {
 }
 
 void addCustomer() {
+    clearTerminal();
     Customer customer;
     customer.id = nextCustomerID++;
-    system("cls"); // Clear screen
-
-    while (true) { // loop until name is letters and spaces only
-        customer.name = getRequiredText("Customer name: ");
-
-        bool isValid = all_of(customer.name.begin(), customer.name.end(), [](char c) {
-            return isalpha(c) || isspace(c);
-        });
-        if (!isValid) {
-            cout << "Invalid customer name. Please enter a valid name containing only letters and spaces.\n";
-            continue;
-        }
-        break;
-    }
-    while (true) { // loop until contact number is digits only
-        customer.contactNumber = getRequiredText("Contact number: ");
-
-        bool isValid = all_of(customer.contactNumber.begin(), customer.contactNumber.end(), [](char c) {
-            return isdigit(c);
-        });
-        if (!isValid) {
-            cout << "Invalid contact number. Please enter a valid contact number containing only digits.\n";
-            continue;
-        }
-        break;
-    }
+    customer.name = getRequiredText("Customer name: ");
+    customer.contactNumber = getRequiredText("Contact number: ");
 
     customers.push_back(customer);
+    clearTerminal();
     cout << "Customer added. Customer ID: " << customer.id << "\n";
 }
 
-void viewCustomers() {    
-    system("cls"); // Clear screen
-    cout << "\nCUSTOMERS\n";
-
+void viewCustomers() {
+    clearTerminal();
     if (customers.empty()) {
-        system("cls"); // Clear screen
         cout << "There are no customer records.\n";
         return;
     }
 
+    cout << "\nCUSTOMERS\n";
     for (const Customer& customer : customers) {
         cout << "ID: " << customer.id
              << " | Name: " << customer.name
@@ -273,6 +222,7 @@ void deleteCustomer() {
     int customerIndex = findCustomerIndex(customerID);
 
     if (customerIndex == -1) {
+        clearTerminal();
         cout << "Customer not found.\n";
         return;
     }
@@ -280,18 +230,19 @@ void deleteCustomer() {
     // Keep customers with orders so those orders still have a valid customer.
     for (const LaundryOrder& order : orders) {
         if (order.customerID == customerID) {
+            clearTerminal();
             cout << "This customer has an order and cannot be deleted.\n";
-            clearScreen();
             return;
         }
     }
 
     customers.erase(customers.begin() + customerIndex);
+    clearTerminal();
     cout << "Customer deleted.\n";
 }
 
 void showServices() {
-    system("cls"); // Clear screen
+    clearTerminal();
     cout << "\nAVAILABLE SERVICES\n";
 
     for (int index = 0; index < static_cast<int>(services.size()); index++) {
@@ -299,7 +250,6 @@ void showServices() {
              << " - P" << fixed << setprecision(2)
              << services[index].ratePerKilo << " per kilo\n";
     }
-
 }
 
 void editServiceRates() {
@@ -307,30 +257,18 @@ void editServiceRates() {
 
     int serviceChoice = getInteger("Choose the service to edit: ", 1,
                                    static_cast<int>(services.size()));
-    
-    if (serviceChoice == -1) {
-        clearScreen();
-        return;
-    }
-
     double newRate = getPositiveNumber("Enter the new price per kilo: ");
-
-    if (newRate == -1) {
-        clearScreen();
-        return;
-    }
 
     services[serviceChoice - 1].ratePerKilo = newRate;
 
     cout << services[serviceChoice - 1].name
          << " is now P" << fixed << setprecision(2)
          << newRate << " per kilo.\n";
-         clearScreen();
 }
 void createOrder() {
     if (customers.empty()) {
+        clearTerminal();
         cout << "Add a customer before creating an order.\n";
-        clearScreen();
         return;
     }
 
@@ -339,8 +277,8 @@ void createOrder() {
                                 numeric_limits<int>::max());
 
     if (findCustomerIndex(customerID) == -1) {
+        clearTerminal();
         cout << "Customer not found.\n";
-        clearScreen(); 
         return;
     }
 
@@ -360,17 +298,16 @@ void createOrder() {
     order.status = "Received";
 
     orders.push_back(order);
-
+    clearTerminal();
     cout << "Order created. Order ID: " << order.id
          << " | Total bill: P" << fixed << setprecision(2)
          << order.totalBill << "\n";
-         clearScreen();
 }
 
 void displayOrders() {
+    clearTerminal();
     if (orders.empty()) {
         cout << "There are no laundry orders.\n";
-        clearScreen();
         return;
     }
 
@@ -387,27 +324,23 @@ void displayOrders() {
              << " | Received: " << order.dateReceived
              << " | Pick-up: " << order.pickupDate
              << " | Status: " << order.status << "\n";
-
-             clearScreen();
     }
 }
 
 void printReceipt() {
-    system("cls"); // Clear screen
-    cout << "========== LAUNDRY RECEIPT ==========\n";
-
+    clearTerminal();
     if (orders.empty()) {
         cout << "There are no laundry orders.\n";
         return;
     }
-
+    displayOrders();
     int orderID = getInteger("Enter the order ID for the receipt: ", 1,
                              numeric_limits<int>::max());
     int orderIndex = findOrderIndex(orderID);
 
-    if (orderIndex == -1 || orderIndex != 0) {
+    if (orderIndex == -1) {
+        clearTerminal();
         cout << "Order not found.\n";
-        clearScreen();
         return;
     }
 
@@ -415,6 +348,7 @@ void printReceipt() {
     int customerIndex = findCustomerIndex(order.customerID);
     const Customer& customer = customers[customerIndex];
 
+    clearTerminal();
     cout << "\n========== LAUNDRY RECEIPT ==========\n";
     cout << "Order ID: " << order.id << "\n";
     cout << "Customer: " << customer.name << "\n";
@@ -426,8 +360,6 @@ void printReceipt() {
     cout << "Status: " << order.status << "\n";
     cout << "Total bill: P" << fixed << setprecision(2) << order.totalBill << "\n";
     cout << "=====================================\n";
-
-    clearScreen();
 }
 
 void showMainMenu() {
@@ -441,4 +373,3 @@ void showMainMenu() {
     cout << "7. Edit service rates\n";
     cout << "0. Exit\n";
 }
-
